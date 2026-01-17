@@ -70,3 +70,13 @@ jobs:
               issue_number: context.issue.number,
               body
             });
+      - name: Debug OIDC subject (claims)
+        run: |
+          sudo apt-get update -y >/dev/null
+          sudo apt-get install -y jq >/dev/null
+          TOKEN_JSON=$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com")
+          JWT=$(echo "$TOKEN_JSON" | jq -r '.value')
+          PAYLOAD=$(echo "$JWT" | cut -d '.' -f2 | tr '_-' '/+' | base64 -d 2>/dev/null || true)
+          echo "$PAYLOAD" | jq '{sub,aud,iss,repository,ref,job_workflow_ref}'
+
