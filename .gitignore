@@ -1,0 +1,16 @@
+# Terraform (NEVER commit)
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/crash.log
+**/crash.*.log
+
+# Lambda build artifacts
+infra/app/modules/lambda/build/
+**/build/
+**/*.zip
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
