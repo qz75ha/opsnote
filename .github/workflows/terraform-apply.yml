@@ -1,0 +1,54 @@
+name: terraform-apply
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "infra/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-apply-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    environment: dev   # ← GitHub Environments の dev（Required reviewers が効く）
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ vars.TF_WORKING_DIR }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN_APPLY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform plan (main)
+        run: |
+          terraform plan -input=false -no-color -out=tfplan
+          terraform show -no-color tfplan > plan.txt
+
+      - name: Publish plan to job summary
+        run: |
+          echo "## Terraform plan (main)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          head -c 60000 plan.txt >> $GITHUB_STEP_SUMMARY
+          echo -e "\n```" >> $GITHUB_STEP_SUMMARY
+
+      - name: Terraform apply
+        run: terraform apply -input=false -auto-approve tfplan

@@ -1,0 +1,72 @@
+name: terraform-plan
+
+on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - ".github/workflows/**"
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ vars.TF_WORKING_DIR }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN_PLAN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Terraform fmt (check)
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: |
+          terraform plan -input=false -no-color -out=tfplan
+          terraform show -no-color tfplan > plan.txt
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: |
+            ${{ vars.TF_WORKING_DIR }}/tfplan
+            ${{ vars.TF_WORKING_DIR }}/plan.txt
+
+      - name: Comment plan to PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const plan = fs.readFileSync('${{ vars.TF_WORKING_DIR }}/plan.txt', 'utf8');
+            const body = [
+              "### Terraform plan",
+              "```",
+              plan.length > 60000 ? plan.slice(0, 60000) + "\n...truncated..." : plan,
+              "```"
+            ].join("\n");
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
