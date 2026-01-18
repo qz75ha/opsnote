@@ -97,6 +97,7 @@ resource "aws_lambda_function" "list" {
   handler       = "list_items.handler"
   runtime       = local.runtime
   filename      = data.archive_file.list_zip.output_path
+  tags          = var.tags
 
   environment {
     variables = {
@@ -113,6 +114,7 @@ resource "aws_lambda_function" "get" {
   handler       = "get_item.handler"
   runtime       = local.runtime
   filename      = data.archive_file.get_zip.output_path
+  tags          = var.tags
 
   environment {
     variables = {
