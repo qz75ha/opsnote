@@ -45,7 +45,7 @@ resource "aws_iam_role_policy" "logs" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ]
-      Resource = "arn:aws:logs:${data.aws_region.current.name}:*:log-group:/aws/lambda/*"
+      Resource = "arn:aws:logs:${data.aws_region.current.region}:*:log-group:/aws/lambda/*"
     }]
   })
 }
@@ -82,6 +82,7 @@ resource "aws_lambda_function" "create" {
   handler       = "create_item.handler"
   runtime       = local.runtime
   filename      = data.archive_file.create_zip.output_path
+  tags          = var.tags
 
   environment {
     variables = {

@@ -5,6 +5,7 @@ locals {
 module "dynamodb" {
   source      = "./modules/dynamodb"
   name_prefix = local.name_prefix
+  tags        = local.common_tags
 }
 
 module "lambda" {
@@ -16,6 +17,8 @@ module "lambda" {
 
   # Lambda ソースのパス（repo ルート基準で app/lambda を参照する想定）
   lambda_src_root = "${path.module}/../../app/lambda"
+
+  tags = local.common_tags
 }
 
 module "apigw" {
@@ -35,4 +38,5 @@ module "apigw" {
 module "frontend" {
   source      = "./modules/frontend_s3"
   name_prefix = local.name_prefix
+  tags        = local.common_tags
 }

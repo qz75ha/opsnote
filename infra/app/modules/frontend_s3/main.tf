@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "site" {
   bucket = "${var.name_prefix}-site"
+  tags   = var.tags
 }
 
 # ACL を無効化してバケットオーナー強制（推奨）
@@ -35,6 +36,7 @@ resource "aws_cloudfront_distribution" "site" {
   comment             = "${var.name_prefix}-site"
   default_root_object = "index.html"
   price_class         = "PriceClass_200"
+  tags                = var.tags
 
   origin {
     domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
