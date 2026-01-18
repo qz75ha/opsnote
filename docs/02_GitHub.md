@@ -319,12 +319,3 @@ terraform validate
 * PR 経由だけで main 更新できるようにする
 * 必須チェックを強制する
 * レビュー必須化
-
----
-
-## 追加提案（資料をさらに教育向けにするなら）
-
-* 「AWS 側（OIDC Provider / Role / trust policy）を AWS CLI で作る手順」も、同じテンプレ形式で追記できます。
-* `Debug OIDC subject` を “必要時のみ” 実行する形に改善（例：手動入力フラグで実行）。
-
-必要なら、次に **AWS 側の trust policy の最終形（plan/apply）**を、あなたの現状に合わせて「最小権限・最小許可条件」へ落とした完成版も作ります。

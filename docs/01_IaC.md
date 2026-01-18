@@ -233,13 +233,3 @@ S3 を公開（public read）すると、
 * `frontend_url = https://...cloudfront.net`
 * `dynamodb_table = opsnote-dev-items`
 * `frontend_bucket = opsnote-dev-site`
-
----
-
-# 次にこちらでできること（どれか選んでください）
-
-1. **IaC の章をさらに具体化**：各 module の変数・output・依存関係を “実コード準拠” で解説
-2. **AWS CLI での再現手順書**：Terraform を補助する形で、AWS CLI で「同等構成を手作業で再現」する教育編（比較学習）
-3. **運用手順（Runbook）**：障害時切り分け、復旧、コスト確認、ログ確認を手順化
-
-最も精度を上げるには、`infra/app` と `infra/bootstrap` の **主要 `.tf`（main/variables/outputs と modules の main）**を貼ってもらえれば、実際のコードに完全一致する形で章立てを確定できます。とはいえ、現時点の情報だけでも上記は教育資料として十分に成立しています。
