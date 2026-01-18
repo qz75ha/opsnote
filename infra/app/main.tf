@@ -1,11 +1,18 @@
-locals {
-  name_prefix = "${var.project}-${var.env}"
+# AppRegistry Application（すでに作成済みなら維持）
+resource "aws_servicecatalogappregistry_application" "this" {
+  name        = "${var.project}-${var.env}"
+  description = "opsnote hands-on application (managed by Terraform)"
+
+  tags = {
+    Project = var.project
+    Env     = var.env
+  }
 }
 
 module "dynamodb" {
   source      = "./modules/dynamodb"
   name_prefix = local.name_prefix
-  tags        = local.common_tags
+  tags        = local.all_tags
 }
 
 module "lambda" {
@@ -18,7 +25,7 @@ module "lambda" {
   # Lambda ソースのパス（repo ルート基準で app/lambda を参照する想定）
   lambda_src_root = "${path.module}/../../app/lambda"
 
-  tags = local.common_tags
+  tags = local.all_tags
 }
 
 module "apigw" {
@@ -33,10 +40,12 @@ module "apigw" {
   create_fn_name = module.lambda.create_fn_name
   list_fn_name   = module.lambda.list_fn_name
   get_fn_name    = module.lambda.get_fn_name
+
+  tags = local.all_tags
 }
 
 module "frontend" {
   source      = "./modules/frontend_s3"
   name_prefix = local.name_prefix
-  tags        = local.common_tags
+  tags        = local.all_tags
 }

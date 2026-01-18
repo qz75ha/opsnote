@@ -11,7 +11,7 @@ variable "list_fn_name" { type = string }
 variable "get_fn_name" { type = string }
 
 variable "tags" {
+  description = "Tags applied to taggable resources (includes awsApplication for AppRegistry)."
   type        = map(string)
   default     = {}
-  description = "Tags to apply to resources in this module"
 }

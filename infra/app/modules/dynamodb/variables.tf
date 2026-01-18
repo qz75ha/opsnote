@@ -1,7 +1,7 @@
 variable "name_prefix" { type = string }
 
 variable "tags" {
-  description = "Tags to apply to resources in this module"
+  description = "Tags applied to taggable resources (includes awsApplication for AppRegistry)."
   type        = map(string)
   default     = {}
 }
